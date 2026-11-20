@@ -28,3 +28,6 @@ supabase/.env.local
 
 # کلید امضا (هرگز commit نشود)
 keystore.b64
+
+# خروجی دانلود APK از Actions
+artifacts/
