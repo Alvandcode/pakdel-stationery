@@ -191,7 +191,7 @@ class ProductRepository @Inject constructor(
     /** حذف منطقی: محصول از کاتالوگ و اپ مشتریان خارج می‌شود ولی سوابق فروش باقی می‌ماند. */
     suspend fun archiveProduct(productId: String): AppResult<Unit> =
         withContext(dispatchers.io) {
-            runCatchingApp {
+            runCatchingApp<Unit> {
                 val existing = productDao.byId(productId)
                     ?: throw IllegalArgumentException("PRODUCT_NOT_FOUND: محصول یافت نشد.")
 

@@ -43,13 +43,17 @@ object DataModule {
             createSupabaseClient(
                 supabaseUrl = config.url,
                 supabaseKey = config.anonKey,
-            )
+            ) {
+                // پیکربندی پیش‌فرض کتابخانه؛ در صورت نیاز پلاگین‌ها اینجا نصب می‌شوند.
+            }
         } else {
             // پیکربندی ناقص: آدرس موقت معتبر تا صفحه راه‌اندازی نمایش داده شود
             // و برنامه با خطای مبهم در زمان تزریق کرش نکند.
             createSupabaseClient(
                 supabaseUrl = "https://setup-required.pakdel.invalid",
                 supabaseKey = "setup-required",
-            )
+            ) {
+                // همان پیکربندی؛ فقط آدرس موقت.
+            }
         }
 }

@@ -275,7 +275,7 @@ class SalesRepository @Inject constructor(
     /** لغو محلی فاکتور؛ ارسال به سرور در مرحله همگام‌سازی (نیازمند مجوز sale.cancel) */
     suspend fun cancelLocally(saleId: String, reason: String): AppResult<Unit> =
         withContext(dispatchers.io) {
-            runCatchingApp {
+            runCatchingApp<Unit> {
                 database.withTransaction {
                     val sale = saleDao.byId(saleId)
                         ?: throw IllegalArgumentException("NOT_FOUND: فاکتور یافت نشد.")
