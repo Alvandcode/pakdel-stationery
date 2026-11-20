@@ -1,0 +1,30 @@
+# Android / Gradle
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+captures/
+.externalNativeBuild/
+.cxx/
+*.jks
+*.keystore
+keystore.properties
+google-services.json
+
+# خروجی‌ها
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# سیستم
+.DS_Store
+Thumbs.db
+
+# Supabase / اسرار استقرار
+supabase/.env
+supabase/.env.local
+
+# کلید امضا (هرگز commit نشود)
+keystore.b64

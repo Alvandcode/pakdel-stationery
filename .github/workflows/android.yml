@@ -1,0 +1,93 @@
+name: Android
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: دریافت کد
+        uses: actions/checkout@v4
+
+      - name: نصب JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: نصب Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: نصب Gradle 8.9 (بدون نیاز به gradle-wrapper.jar)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: آماده‌سازی کلید امضا (اختیاری)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/pakdel.jks"
+            {
+              echo "PAKDEL_KEYSTORE=$RUNNER_TEMP/pakdel.jks"
+              echo "PAKDEL_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+              echo "PAKDEL_KEY_ALIAS=$KEY_ALIAS"
+              echo "PAKDEL_KEY_PASSWORD=$KEY_PASSWORD"
+            } >> "$GITHUB_ENV"
+            echo "امضا فعال است."
+          else
+            echo "کلید امضا تنظیم نشده؛ فقط APK آزمایشی (debug) ساخته می‌شود."
+          fi
+
+      - name: تست‌های واحد
+        working-directory: android
+        run: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+          gradle --no-daemon :core:common:testDebugUnitTest :core:data:testDebugUnitTest
+
+      - name: ساخت APK
+        working-directory: android
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          gradle --no-daemon :app-manager:assembleDebug :app-shop:assembleDebug
+          if [ -n "$PAKDEL_KEYSTORE" ]; then
+            gradle --no-daemon :app-manager:assembleRelease :app-shop:assembleRelease
+          fi
+
+      - name: ذخیره APKها به‌عنوان خروجی
+        uses: actions/upload-artifact@v4
+        with:
+          name: pakdel-apk
+          if-no-files-found: error
+          path: |
+            android/app-manager/build/outputs/apk/debug/*.apk
+            android/app-shop/build/outputs/apk/debug/*.apk
+            android/app-manager/build/outputs/apk/release/*.apk
+            android/app-shop/build/outputs/apk/release/*.apk
+
+      - name: انتشار در Releases (فقط برای تگ v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            android/app-manager/build/outputs/apk/debug/*.apk
+            android/app-shop/build/outputs/apk/debug/*.apk
+            android/app-manager/build/outputs/apk/release/*.apk
+            android/app-shop/build/outputs/apk/release/*.apk

@@ -1,0 +1,9 @@
+# این فایل را به local.properties کپی کرده و مقادیر واقعی را جایگزین کنید.
+# مسیر SDK اندروید
+sdk.dir=C\:\\Users\\<USER>\\AppData\\Local\\Android\\Sdk
+
+# از داشبورد Supabase → Project Settings → API
+SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+SUPABASE_ANON_KEY=YOUR_ANON_PUBLIC_KEY
+
+# هشدار: کلید service_role را هرگز اینجا قرار ندهید.
