@@ -42,7 +42,7 @@ class DashboardViewModel @Inject constructor(
     sessionManager: SessionManager,
     salesRepository: SalesRepository,
     productRepository: ProductRepository,
-    syncEngine: SyncEngine,
+    private val syncEngine: SyncEngine,
 ) : ViewModel() {
 
     val refreshing = MutableStateFlow(false)
