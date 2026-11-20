@@ -27,11 +27,14 @@ jobs:
 
       - name: آماده‌سازی Android SDK (از پیش نصب‌شده روی runner)
         run: |
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          yes | sdkmanager --licenses > /dev/null 2>&1 || true
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" > /dev/null
-          ls "$ANDROID_SDK_ROOT/platforms"
+          echo "SDK=$ANDROID_SDK_ROOT"
+          SDKM="$(ls -d "$ANDROID_SDK_ROOT"/cmdline-tools/*/bin/sdkmanager 2>/dev/null | head -n1)"
+          if [ -n "$SDKM" ]; then
+            yes | "$SDKM" --licenses > /dev/null 2>&1 || true
+            "$SDKM" "platform-tools" "platforms;android-35" "build-tools;35.0.0" > /dev/null 2>&1 || true
+          fi
+          echo "platforms: $(ls "$ANDROID_SDK_ROOT/platforms" 2>/dev/null | tr '\n' ' ')"
+          echo "build-tools: $(ls "$ANDROID_SDK_ROOT/build-tools" 2>/dev/null | tr '\n' ' ')"
 
       - name: نصب Gradle 8.9 (بدون نیاز به gradle-wrapper.jar)
         uses: gradle/actions/setup-gradle@v4
