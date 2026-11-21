@@ -13,7 +13,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
 import javax.inject.Singleton
 
 @Module
@@ -34,7 +36,8 @@ object DataModule {
      * کلاینت Supabase با کلید عمومی (anon).
      *
      * - کلید service_role هرگز در اپ قرار نمی‌گیرد.
-     * - پلاگین‌های Auth/Postgrest/Storage در نسخه ۳ به‌صورت خودکار نصب می‌شوند.
+     * - در Supabase-kt نسخه ۳، پلاگین‌ها باید صریحاً نصب شوند؛ در غیر این صورت
+     *   صدا زدن `postgrest`/`auth` با خطای «Plugin not installed» شکست می‌خورد.
      */
     @Provides
     @Singleton
@@ -44,7 +47,8 @@ object DataModule {
                 supabaseUrl = config.url,
                 supabaseKey = config.anonKey,
             ) {
-                // پیکربندی پیش‌فرض کتابخانه؛ در صورت نیاز پلاگین‌ها اینجا نصب می‌شوند.
+                install(Auth)
+                install(Postgrest)
             }
         } else {
             // پیکربندی ناقص: آدرس موقت معتبر تا صفحه راه‌اندازی نمایش داده شود
@@ -53,7 +57,8 @@ object DataModule {
                 supabaseUrl = "https://setup-required.pakdel.invalid",
                 supabaseKey = "setup-required",
             ) {
-                // همان پیکربندی؛ فقط آدرس موقت.
+                install(Auth)
+                install(Postgrest)
             }
         }
 }

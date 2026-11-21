@@ -53,9 +53,28 @@ class AuthRepository @Inject constructor(
                     throw IllegalArgumentException("VALIDATION: ایمیل و رمز عبور را وارد کنید.")
                 }
 
-                supabase.auth.signInWith(Email) {
-                    this.email = normalizedEmail
-                    this.password = password
+                try {
+                    supabase.auth.signInWith(Email) {
+                        this.email = normalizedEmail
+                        this.password = password
+                    }
+                } catch (authError: Exception) {
+                    // پیام‌های خام Supabase به فارسی و قابل‌فهم ترجمه می‌شوند؛
+                    // کد AUTH_FAILED به‌صورت AppError.Domain نمایش داده می‌شود.
+                    val raw = authError.message.orEmpty()
+                    val persian = when {
+                        raw.contains("Invalid login credentials", true) ->
+                            "ایمیل یا رمز عبور اشتباه است. اگر حساب خود را تازه ساخته‌اید، " +
+                                "ایمیل و رمز را دوباره بررسی کنید."
+                        raw.contains("Email not confirmed", true) ->
+                            "ایمیل شما هنوز تأیید نشده است. از مدیر بخواهید کاربر را تأیید کند."
+                        raw.contains("Plugin", true) ->
+                            "اتصال به سرور پیکربندی نشده است. نسخهٔ جدید برنامه را نصب کنید."
+                        raw.contains("timeout", true) || raw.contains("connect", true) ->
+                            "اتصال به سرور برقرار نشد. اینترنت گوشی را بررسی کنید."
+                        else -> "ورود ناموفق بود: $raw"
+                    }
+                    throw IllegalArgumentException("AUTH_FAILED: $persian")
                 }
 
                 val user = supabase.auth.currentUserOrNull()
