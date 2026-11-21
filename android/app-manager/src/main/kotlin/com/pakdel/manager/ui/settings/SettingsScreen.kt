@@ -29,6 +29,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -74,6 +77,9 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
     val membersLoading by viewModel.membersLoading.collectAsStateWithLifecycle()
     val membersError by viewModel.membersError.collectAsStateWithLifecycle()
     val inviting by viewModel.inviting.collectAsStateWithLifecycle()
+    val inviteCode by viewModel.inviteCode.collectAsStateWithLifecycle()
+    val codeLoading by viewModel.codeLoading.collectAsStateWithLifecycle()
+    val clipboard = LocalClipboardManager.current
 
     var showLogout by remember { mutableStateOf(false) }
     var roleDialogMember by remember { mutableStateOf<MemberDto?>(null) }
@@ -218,6 +224,43 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
             }
 
             if (session?.canManageStaff == true) {
+                SectionCard(title = "کد دعوت فروشگاه") {
+                    Text(
+                        "همکارتان اپ «پاکدل مدیریت» را نصب می‌کند، «ساخت حساب» را می‌زند و " +
+                            "این کد را وارد می‌کند. بعد از آن می‌توانید نقش او را از فهرست " +
+                            "کارکنان به مدیر یا هر نقش دیگری تغییر دهید.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = inviteCode ?: if (codeLoading) "در حال دریافت..." else "—",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        TextButton(
+                            enabled = inviteCode != null,
+                            onClick = {
+                                inviteCode?.let {
+                                    clipboard.setText(AnnotatedString(it))
+                                    scope.launch { snackbar.showSnackbar("کد دعوت کپی شد.") }
+                                }
+                            },
+                        ) { Text("کپی") }
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    PakdelOutlinedButton(
+                        text = "ساخت کد جدید (کد قبلی باطل می‌شود)",
+                        onClick = viewModel::rotateInviteCode,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+
                 SectionCard(title = "کارکنان") {
                     if (membersLoading && members.isEmpty()) {
                         Text("در حال دریافت فهرست...", style = MaterialTheme.typography.bodySmall)
@@ -274,8 +317,8 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "ابتدا کاربر را در Supabase → Authentication بسازید یا دعوت کنید، " +
-                                "سپس ایمیل او را اینجا اضافه کنید.",
+                            "اگر همکار از قبل حساب دارد، با ایمیل او را اضافه کنید؛ " +
+                                "در غیر این صورت «کد دعوت» بالا را برایش بفرستید.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -285,7 +328,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = hiltViewModel()) {
 
             SectionCard(title = "درباره") {
                 Text(
-                    "پاکدل استیشنری — نسخه ۱.۰.۰",
+                    "پاکدل استیشنری — نسخه ${com.pakdel.manager.BuildConfig.VERSION_NAME}",
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Text(

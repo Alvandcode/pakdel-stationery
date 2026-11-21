@@ -135,6 +135,7 @@ COGS        = Σ sale_items.qty * sale_items.unit_cost      (در لحظه فر�
 | `20260101000006_seed.sql` | نقش‌ها، دسترسی‌ها، دسته‌بندی‌های اولیه |
 | `20260101000007_product_rpc.sql` | ثبت/ویرایش و غیرفعال‌سازی اتمیک محصول + تاریخچه قیمت |
 | `20260101000008_fixes.sql` | `rpc_my_context`، `rpc_upsert_customer`، مدیریت کارکنان، محافظت نسیه بدون مشتری و محدود‌سازی لغو فاکتور به فروشگاه خودی |
+| `20260101000009_onboarding.sql` | کد دعوت فروشگاه (`stores.invite_code`)، `rpc_create_store`، `rpc_join_store`، `rpc_store_invite_code`، `rpc_rotate_invite_code` |
 
 اجرا در Supabase SQL Editor یا با CLI:
 

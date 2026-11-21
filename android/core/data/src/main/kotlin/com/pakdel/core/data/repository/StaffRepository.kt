@@ -7,6 +7,8 @@ import com.pakdel.core.data.remote.MemberDto
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import javax.inject.Inject
@@ -15,11 +17,18 @@ import javax.inject.Singleton
 /**
  * مدیریت کارکنان.
  *
- * ساخت کاربر Auth بیرون از اپ (داشبورد Supabase) انجام می‌شود تا کلید
- * `service_role` هرگز در اپ قرار نگیرد؛ سپس `rpc_invite_member` فقط
- * عضویت و نقش همان ایمیل را در فروشگاه ثبت می‌کند.
- * همه عملیات با مجوز `staff.manage` در سرور کنترل می‌شوند.
+ * دو راه برای افزودن همکار:
+ *   ۱) کد دعوت فروشگاه (`rpc_store_invite_code`) که همکار در اپ خودش
+ *      «ساخت حساب + پیوستن با کد» را انجام می‌دهد — بدون دخالت مدیر.
+ *   ۲) افزودن با ایمیل (`rpc_invite_member`) برای حسابی که از قبل ساخته شده.
+ * همه عملیات با مجوز `staff.manage` در سرور کنترل می‌شوند و کلید
+ * `service_role` هرگز در اپ قرار نمی‌گیرد.
  */
+@Serializable
+private data class InviteCodeDto(
+    @SerialName("invite_code") val inviteCode: String = "",
+)
+
 @Singleton
 class StaffRepository @Inject constructor(
     private val supabase: SupabaseClient,
@@ -73,4 +82,20 @@ class StaffRepository @Inject constructor(
                 ).decodeAs<MemberDto>()
             }
         }
+
+    /** کد دعوت فروشگاه جاری (فقط با مجوز staff.manage). */
+    suspend fun inviteCode(): AppResult<String> = withContext(dispatchers.io) {
+        runCatchingApp {
+            supabase.postgrest.rpc("rpc_store_invite_code")
+                .decodeAs<InviteCodeDto>().inviteCode
+        }
+    }
+
+    /** ساخت کد دعوت جدید؛ کد قبلی باطل می‌شود. */
+    suspend fun rotateInviteCode(): AppResult<String> = withContext(dispatchers.io) {
+        runCatchingApp {
+            supabase.postgrest.rpc("rpc_rotate_invite_code")
+                .decodeAs<InviteCodeDto>().inviteCode
+        }
+    }
 }

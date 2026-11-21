@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +37,13 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
     var password by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
     var loading by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
     var error by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf<String?>(null) }
+    var showOnboarding by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    if (showOnboarding) {
+        OnboardingScreen(onBack = { showOnboarding = false })
+        return
+    }
 
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
@@ -103,7 +110,14 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
                 enabled = email.isNotBlank() && password.isNotBlank(),
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(8.dp))
+            TextButton(
+                onClick = { showOnboarding = true },
+                enabled = !loading,
+            ) {
+                Text("حساب ندارید؟ ساخت حساب / پیوستن با کد دعوت")
+            }
+            Spacer(Modifier.height(12.dp))
             Text(
                 "دسترسی هر کاربر بر اساس نقش تعریف‌شده در سرور تعیین می‌شود.",
                 style = MaterialTheme.typography.bodySmall,

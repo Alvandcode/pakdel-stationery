@@ -56,11 +56,20 @@ class SettingsViewModel @Inject constructor(
     private val _inviting = MutableStateFlow(false)
     val inviting: StateFlow<Boolean> = _inviting.asStateFlow()
 
+    private val _inviteCode = MutableStateFlow<String?>(null)
+    val inviteCode: StateFlow<String?> = _inviteCode.asStateFlow()
+
+    private val _codeLoading = MutableStateFlow(false)
+    val codeLoading: StateFlow<Boolean> = _codeLoading.asStateFlow()
+
     init {
         // فهرست کارکنان فقط برای نقش‌های دارای مجوز staff.manage بارگذاری می‌شود
         viewModelScope.launch {
             session.collect { current ->
-                if (current?.canManageStaff == true) loadMembers()
+                if (current?.canManageStaff == true) {
+                    loadMembers()
+                    loadInviteCode()
+                }
             }
         }
     }
@@ -135,6 +144,35 @@ class SettingsViewModel @Inject constructor(
                 is AppResult.Failure -> _membersError.value = result.error.message
             }
             _membersLoading.value = false
+        }
+    }
+
+    /** کد دعوت فعلی فروشگاه؛ همکاران با آن خودشان عضو می‌شوند. */
+    fun loadInviteCode() {
+        if (_codeLoading.value) return
+        _codeLoading.value = true
+        viewModelScope.launch {
+            when (val result = staffRepository.inviteCode()) {
+                is AppResult.Success -> _inviteCode.value = result.data
+                is AppResult.Failure -> _membersError.value = result.error.message
+            }
+            _codeLoading.value = false
+        }
+    }
+
+    /** ساخت کد جدید؛ کد قبلی دیگر کار نمی‌کند. */
+    fun rotateInviteCode() {
+        if (_codeLoading.value) return
+        _codeLoading.value = true
+        viewModelScope.launch {
+            when (val result = staffRepository.rotateInviteCode()) {
+                is AppResult.Success -> {
+                    _inviteCode.value = result.data
+                    _message.value = "کد دعوت جدید ساخته شد؛ کد قبلی باطل شد."
+                }
+                is AppResult.Failure -> _message.value = result.error.message
+            }
+            _codeLoading.value = false
         }
     }
 

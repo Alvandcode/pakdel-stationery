@@ -51,6 +51,21 @@ Claimهای سفارشی (اختیاری، برای سازگاری با نسخه
 ساخت کاربر Auth در داشبورد انجام می‌شود تا کلید `service_role` در اپ نباشد.
 پاسخ: `{ id, user_id, full_name, email, role, is_active, created_at }`.
 
+### `rpc_create_store(p_name text, p_branch_name text default 'اصلی') → jsonb`
+هر کاربر احراز هویت‌شده‌ای که عضو هیچ فروشگاهی نیست، فروشگاه خودش را می‌سازد
+و **مالک** آن می‌شود (نقش‌ها، مجوزها، شعبه و دسته‌بندی‌های اولیه خودکار ساخته می‌شوند).
+پاسخ: `{ store_id, store_name, invite_code, role }`.
+اگر کاربر از قبل عضو فروشگاهی باشد: `FORBIDDEN`.
+
+### `rpc_join_store(p_code text) → jsonb`
+پیوستن به فروشگاه با **کد دعوت ۸ کاراکتری** (بدون نیاز به مدیر سیستم).
+عضو جدید با نقش پیش‌فرض `sales` اضافه می‌شود؛ ارتقای نقش با `rpc_set_member_role`.
+پاسخ: `{ store_id, store_name, role, member_id }`. کد نامعتبر: `NOT_FOUND`.
+
+### `rpc_store_invite_code() → jsonb` / `rpc_rotate_invite_code() → jsonb`
+خواندن و چرخش کد دعوت فروشگاه (نیازمند `staff.manage`).
+پاسخ: `{ invite_code }`. چرخش، کد قبلی را باطل می‌کند.
+
 ## ۳.۳ توابع تجاری (RPC)
 
 ### `rpc_checkout_sale(p_payload jsonb) → jsonb`

@@ -116,6 +116,7 @@ pakdel-stationery/
 | دیتابیس کامل: جدول‌ها، ایندکس‌ها، RLS، توابع اتمیک | ✅ |
 | ورود، داشبورد، محصولات، انبار، صندوق فروش، مشتری/نسیه، تنظیمات | ✅ |
 | کارکنان: نقش‌ها، فعال/غیرفعال، افزودن عضو | ✅ |
+| ثبت‌نام، ساخت فروشگاه، پیوستن با کد دعوت (بدون مدیر سیستم) | ✅ |
 | همگام‌سازی دوطرفه + رفع تعارض + تلاش مجدد | ✅ |
 | کاتالوگ مشتری + فیلتر دسته‌بندی | ✅ |
 | سبد خرید، سفارش آنلاین، پرداخت (Shop) | ⏳ |
@@ -241,6 +242,7 @@ cd ../android
 | Full database: tables, indexes, RLS, atomic functions | ✅ |
 | Auth, dashboard, products, inventory, POS, customers & credit, settings | ✅ |
 | Staff: roles, activate/deactivate, invite | ✅ |
+| Self sign-up, create store, join by invite code (no admin needed) | ✅ |
 | Bidirectional sync + conflict resolution + retry | ✅ |
 | Customer catalog + category filter | ✅ |
 | Cart, online orders, payments (Shop) | ⏳ |
