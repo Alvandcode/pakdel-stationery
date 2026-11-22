@@ -221,7 +221,7 @@ class AuthRepository @Inject constructor(
     /** خواندن مجدد نشست از حافظه (بدون فراخوانی شبکه) */
     suspend fun currentSession(): AppResult<Session> = withContext(dispatchers.io) {
         val session = sessionManager.current()
-        if (session == null) AppResult.Failure(AppError.Unauthorized) else AppResult.Success(session)
+        if (session == null) AppResult.Failure(AppError.Unauthorized()) else AppResult.Success(session)
     }
 
     /**
