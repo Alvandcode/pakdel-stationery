@@ -28,6 +28,7 @@ import com.pakdel.core.data.session.Session
 import com.pakdel.manager.ui.auth.LoginScreen
 import com.pakdel.manager.ui.dashboard.DashboardScreen
 import com.pakdel.manager.ui.inventory.InventoryScreen
+import com.pakdel.manager.ui.invoices.InvoicesScreen
 import com.pakdel.manager.ui.pos.PosScreen
 import com.pakdel.manager.ui.products.ProductsScreen
 import com.pakdel.manager.ui.settings.SettingsScreen
@@ -97,7 +98,12 @@ private fun ManagerScaffold(session: Session) {
             startDestination = "dashboard",
             modifier = Modifier.padding(padding),
         ) {
-            composable("dashboard") { DashboardScreen() }
+            composable("dashboard") {
+                DashboardScreen(onOpenInvoices = { navController.navigate("invoices") })
+            }
+            composable("invoices") {
+                InvoicesScreen(onBack = { navController.popBackStack() })
+            }
             composable("products") { ProductsScreen() }
             composable("inventory") { InventoryScreen() }
             composable("pos") { PosScreen(session) }

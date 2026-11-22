@@ -180,6 +180,44 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    /**
+     * تازه‌سازی نقش/نام از سرور بدون خروج کاربر.
+     *
+     * چرا لازم است: نقش کاربر در DataStore کش می‌شود؛ اگر مدیر، کارمندی را ارتقا یا
+     * غیرفعال کند، بدون این تازه‌سازی تا خروج/ورود بعدی رابط کاربری قدیمی می‌ماند.
+     * خطای شبکه هرگز کاربر را بیرون نمی‌اندازد (نشست محلی دست‌نخورده می‌ماند).
+     */
+    suspend fun refreshContext(): AppResult<Unit> = withContext(dispatchers.io) {
+        runCatchingApp {
+            val current = sessionManager.current() ?: throw IllegalStateException(
+                "UNAUTHORIZED: نشست کاربر یافت نشد."
+            )
+            val user = supabase.auth.currentUserOrNull()
+                ?: throw IllegalStateException("UNAUTHORIZED: نشست منقضی شده است.")
+
+            val context = runCatching { resolveContext(user.id) }.getOrNull() ?: return@runCatchingApp
+            if (context.storeId.isBlank()) return@runCatchingApp
+
+            // فروشگاه عوض شده است (مثلاً کاربر با کد دعوت به فروشگاه دیگری پیوسته):
+            // داده محلی باید پاک شود تا فروش‌های دو فروشگاه قاطی نشوند.
+            if (context.storeId != current.storeId) {
+                database.clearAllTables()
+            }
+
+            val role = context.role.takeIf { it.isNotBlank() } ?: current.role
+            val displayName = context.displayName.takeIf { it.isNotBlank() } ?: current.displayName
+
+            sessionManager.save(
+                current.copy(
+                    storeId = context.storeId,
+                    role = role,
+                    displayName = displayName,
+                ),
+                context.storeName,
+            )
+        }
+    }
+
     /** خواندن مجدد نشست از حافظه (بدون فراخوانی شبکه) */
     suspend fun currentSession(): AppResult<Session> = withContext(dispatchers.io) {
         val session = sessionManager.current()

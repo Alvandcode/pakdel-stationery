@@ -31,3 +31,5 @@ keystore.b64
 
 # خروجی دانلود APK از Actions
 artifacts/
+art*/
+artifacts*/

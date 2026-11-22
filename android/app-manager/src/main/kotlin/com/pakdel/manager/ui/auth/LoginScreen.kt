@@ -111,6 +111,15 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(8.dp))
+            if (error?.contains("فروشگاه") == true) {
+                // ورود موفق بوده ولی حساب به فروشگاهی وصل نیست: مسیر رفعش همین‌جاست
+                TextButton(
+                    onClick = { showOnboarding = true },
+                    enabled = !loading,
+                ) {
+                    Text("ساخت فروشگاه جدید یا پیوستن با کد دعوت")
+                }
+            }
             TextButton(
                 onClick = { showOnboarding = true },
                 enabled = !loading,

@@ -1,5 +1,6 @@
 package com.pakdel.manager.ui.dashboard
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,7 +42,10 @@ import com.pakdel.core.designsystem.theme.PakdelAmber
 import com.pakdel.core.designsystem.theme.SuccessGreen
 
 @Composable
-fun DashboardScreen(viewModel: DashboardViewModel = hiltViewModel()) {
+fun DashboardScreen(
+    onOpenInvoices: () -> Unit = {},
+    viewModel: DashboardViewModel = hiltViewModel(),
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val refreshing by viewModel.refreshing.collectAsStateWithLifecycle()
 
@@ -96,7 +100,9 @@ fun DashboardScreen(viewModel: DashboardViewModel = hiltViewModel()) {
                     value = state.invoiceCount.toString(),
                     icon = Icons.Outlined.ReceiptLong,
                     tint = InfoCyan,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(onClick = onOpenInvoices),
                 )
             }
         }

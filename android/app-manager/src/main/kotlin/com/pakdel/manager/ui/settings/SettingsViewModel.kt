@@ -182,6 +182,8 @@ class SettingsViewModel @Inject constructor(
                 is AppResult.Success -> {
                     _message.value = "نقش ${member.fullName} به‌روزرسانی شد."
                     loadMembers()
+                    // اگر نقش خود کاربر عوض شده، دسترسی‌های همین دستگاه فوراً تازه شود
+                    if (member.userId == session.value?.userId) authRepository.refreshContext()
                 }
                 is AppResult.Failure -> _message.value = result.error.message
             }
@@ -198,6 +200,7 @@ class SettingsViewModel @Inject constructor(
                         "دسترسی ${member.fullName} فعال شد."
                     }
                     loadMembers()
+                    if (member.userId == session.value?.userId) authRepository.refreshContext()
                 }
                 is AppResult.Failure -> _message.value = result.error.message
             }

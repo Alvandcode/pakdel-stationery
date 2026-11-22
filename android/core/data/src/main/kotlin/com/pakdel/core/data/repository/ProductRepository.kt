@@ -19,6 +19,8 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -27,6 +29,9 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import javax.inject.Inject
 import javax.inject.Singleton
+
+@Serializable
+private data class PublishAllDto(@SerialName("published") val published: Int = 0)
 
 /** ورودی فرم محصول؛ همان چیزی که مدیر در صفحه ویرایش پر می‌کند */
 data class ProductDraft(
@@ -287,6 +292,17 @@ class ProductRepository @Inject constructor(
                 categoryDao.upsertAll(categories.map { it.toCategoryEntity() })
             }
             products.size
+        }
+    }
+
+    /**
+     * انتشار همه محصولات فعال فروشگاه در کاتالوگ اپ مشتری.
+     * سرور این کار را در یک تراکنش انجام می‌دهد (به‌جای N درخواست).
+     */
+    suspend fun publishAll(): AppResult<Int> = withContext(dispatchers.io) {
+        runCatchingApp {
+            val result = supabase.postgrest.rpc("rpc_publish_all_products")
+            result.decodeAs<PublishAllDto>().published
         }
     }
 

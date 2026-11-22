@@ -58,6 +58,8 @@ class ProductsViewModel @Inject constructor(
     val query = MutableStateFlow("")
     val refreshing = MutableStateFlow(false)
 
+    val publishing = MutableStateFlow(false)
+
     /** فقط نقش‌های دارای مجوز product.manage می‌توانند کالا ثبت/ویرایش/حذف کنند. */
     val canManage: StateFlow<Boolean> = sessionManager.session
         .map { it?.canManageProducts == true }
@@ -91,6 +93,30 @@ class ProductsViewModel @Inject constructor(
                 is AppResult.Failure -> _message.value = result.error.message
             }
             refreshing.value = false
+        }
+    }
+
+    /** انتشار همه کالاهای فعال در کاتالوگ اپ مشتری (یک تراکنش در سرور). */
+    fun publishAll() {
+        if (publishing.value) return
+        if (!canManage.value) {
+            _message.value = "شما مجوز مدیریت محصولات ندارید."
+            return
+        }
+        publishing.value = true
+        viewModelScope.launch {
+            when (val result = repository.publishAll()) {
+                is AppResult.Success -> {
+                    _message.value = if (result.data == 0) {
+                        "همهٔ کالاهای فعال از قبل منتشر شده بودند."
+                    } else {
+                        "${result.data} کالا در فروشگاه آنلاین منتشر شد."
+                    }
+                    refresh()
+                }
+                is AppResult.Failure -> _message.value = result.error.message
+            }
+            publishing.value = false
         }
     }
 

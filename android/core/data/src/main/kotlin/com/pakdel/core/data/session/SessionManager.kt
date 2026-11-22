@@ -119,7 +119,8 @@ class SessionManager @Inject constructor(
             prefs[Keys.storeId] = session.storeId
             prefs[Keys.role] = session.role
             prefs[Keys.displayName] = session.displayName
-            prefs[Keys.storeName] = storeName
+            // نام خالی نباید نام درست قبلی را پاک کند (مثلاً وقتی سرور نام را برنگرداند)
+            if (storeName.isNotBlank()) prefs[Keys.storeName] = storeName
         }
     }
 

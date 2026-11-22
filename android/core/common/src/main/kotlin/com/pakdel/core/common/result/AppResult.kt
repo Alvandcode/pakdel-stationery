@@ -8,13 +8,14 @@ sealed interface AppError {
         override val message = "اتصال به سرور برقرار نیست. عملیات به‌صورت آفلاین ثبت شد."
     }
 
-    data object Unauthorized : AppError {
-        override val message = "نشست شما منقضی شده است. دوباره وارد شوید."
-    }
+    /** پیام دقیق سرور (مثلاً «حساب شما به فروشگاهی متصل نیست») حفظ می‌شود. */
+    data class Unauthorized(
+        override val message: String = "نشست شما منقضی شده است. دوباره وارد شوید.",
+    ) : AppError
 
-    data object Forbidden : AppError {
-        override val message = "شما دسترسی لازم برای این عملیات را ندارید."
-    }
+    data class Forbidden(
+        override val message: String = "شما دسترسی لازم برای این عملیات را ندارید.",
+    ) : AppError
 
     data class Validation(override val message: String) : AppError
 
@@ -75,8 +76,9 @@ fun Throwable.toAppError(): AppError {
             raw.contains("failed to connect", true) || raw.contains("connection refused", true) ->
             AppError.Network
 
-        code == "FORBIDDEN" -> AppError.Forbidden
-        code == "UNAUTHORIZED" || code == "JWT" || code == "PGRST301" -> AppError.Unauthorized
+        code == "FORBIDDEN" -> AppError.Forbidden(text)
+        code == "UNAUTHORIZED" || code == "JWT" || code == "PGRST301" ->
+            AppError.Unauthorized(text)
 
         // تعارض‌هایی که نیازمند تصمیم انسان هستند
         code != null && code in setOf(

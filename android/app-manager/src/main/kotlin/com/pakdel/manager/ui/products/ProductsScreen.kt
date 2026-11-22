@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CloudUpload
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
@@ -69,6 +70,7 @@ fun ProductsScreen(viewModel: ProductsViewModel = hiltViewModel()) {
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val query by viewModel.query.collectAsStateWithLifecycle()
     val refreshing by viewModel.refreshing.collectAsStateWithLifecycle()
+    val publishing by viewModel.publishing.collectAsStateWithLifecycle()
     val form by viewModel.form.collectAsStateWithLifecycle()
     val canManage by viewModel.canManage.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
@@ -112,6 +114,17 @@ fun ProductsScreen(viewModel: ProductsViewModel = hiltViewModel()) {
                     leadingIcon = Icons.Outlined.Search,
                     modifier = Modifier.weight(1f),
                 )
+                if (canManage) {
+                    IconButton(
+                        onClick = viewModel::publishAll,
+                        enabled = !publishing,
+                    ) {
+                        Icon(
+                            Icons.Outlined.CloudUpload,
+                            contentDescription = "انتشار همه در فروشگاه آنلاین",
+                        )
+                    }
+                }
                 IconButton(onClick = viewModel::refresh, enabled = !refreshing) {
                     Icon(Icons.Outlined.Refresh, contentDescription = "دریافت از سرور")
                 }

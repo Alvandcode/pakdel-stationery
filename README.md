@@ -117,6 +117,8 @@ pakdel-stationery/
 | ورود، داشبورد، محصولات، انبار، صندوق فروش، مشتری/نسیه، تنظیمات | ✅ |
 | کارکنان: نقش‌ها، فعال/غیرفعال، افزودن عضو | ✅ |
 | ثبت‌نام، ساخت فروشگاه، پیوستن با کد دعوت (بدون مدیر سیستم) | ✅ |
+| فهرست فاکتورها با جزئیات و لغو/برگشت فروش | ✅ |
+| انتشار گروهی کالاها در فروشگاه آنلاین | ✅ |
 | همگام‌سازی دوطرفه + رفع تعارض + تلاش مجدد | ✅ |
 | کاتالوگ مشتری + فیلتر دسته‌بندی | ✅ |
 | سبد خرید، سفارش آنلاین، پرداخت (Shop) | ⏳ |
@@ -243,6 +245,8 @@ cd ../android
 | Auth, dashboard, products, inventory, POS, customers & credit, settings | ✅ |
 | Staff: roles, activate/deactivate, invite | ✅ |
 | Self sign-up, create store, join by invite code (no admin needed) | ✅ |
+| Invoice list with details, cancel/return sale | ✅ |
+| Bulk publish catalog to the online shop | ✅ |
 | Bidirectional sync + conflict resolution + retry | ✅ |
 | Customer catalog + category filter | ✅ |
 | Cart, online orders, payments (Shop) | ⏳ |
