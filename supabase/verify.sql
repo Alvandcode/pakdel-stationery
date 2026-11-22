@@ -1,6 +1,6 @@
 -- =============================================================
 -- Pakdel Stationery — بررسی سلامت نصب
--- پس از اجرای مهاجرت‌های ۰۱ تا ۰۸ این فایل را در SQL Editor اجرا کنید.
+-- پس از اجرای مهاجرت‌های ۰۱ تا ۱۰ این فایل را در SQL Editor اجرا کنید.
 -- هر ردیف باید status = 'OK' باشد.
 -- =============================================================
 
@@ -30,7 +30,10 @@ expected_functions(name) as (
     ('rpc_record_payment'), ('rpc_upsert_product'), ('rpc_delete_product'),
     ('rpc_upsert_customer'), ('rpc_list_members'), ('rpc_set_member_role'),
     ('rpc_set_member_active'), ('rpc_invite_member'), ('fn_bootstrap_store'),
-    ('fn_sale_require_customer')
+    ('fn_sale_require_customer'),
+    ('rpc_create_store'), ('rpc_join_store'), ('rpc_store_invite_code'),
+    ('rpc_rotate_invite_code'), ('fn_generate_invite_code'),
+    ('rpc_publish_all_products')
 )
 select 'جدول: ' || e.name as check_name,
        case when t.tablename is null then 'MISSING' else 'OK' end as status

@@ -62,6 +62,10 @@ Claimهای سفارشی (اختیاری، برای سازگاری با نسخه
 عضو جدید با نقش پیش‌فرض `sales` اضافه می‌شود؛ ارتقای نقش با `rpc_set_member_role`.
 پاسخ: `{ store_id, store_name, role, member_id }`. کد نامعتبر: `NOT_FOUND`.
 
+### `rpc_publish_all_products() → jsonb`
+همهٔ محصولات فعال فروشگاه را در کاتالوگ عمومی (`is_public = true`) منتشر می‌کند
+(نیازمند `product.manage`). پاسخ: `{ published }` و یک رکورد `audit_logs`.
+
 ### `rpc_store_invite_code() → jsonb` / `rpc_rotate_invite_code() → jsonb`
 خواندن و چرخش کد دعوت فروشگاه (نیازمند `staff.manage`).
 پاسخ: `{ invite_code }`. چرخش، کد قبلی را باطل می‌کند.
